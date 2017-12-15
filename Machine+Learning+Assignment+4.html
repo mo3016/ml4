@@ -11799,81 +11799,7 @@ numerical attributes available for the first 640 Argentinian players (as appeare
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>By exploring the link www.sofifa.com, we realised the url changes to to reference the player selected. In addition, we noticed only a maximimum of 80 players of a country fit on one page. By clicking next we noticed how the offset refelects this fact by incrementing in units of 80. Using this insight we ran the provided code footballscrape.py (snippet below) to get the data for Argentinian players. This file was downloaded and saved as 'ArgentinaPlayers.csv'.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>football.py code</strong></p>
-<p>import pandas as pd</p>
-<p>from bs4 import BeautifulSoup</p>
-<p>import requests</p>
-<p>import re</p>
-<p>import unicodedata</p>
-<p>attributes=['Crossing','Finishing','Heading accuracy',</p>
-<p>'Short passing','Volleys','Dribbling','Curve',</p>
-<p>'Free kick accuracy','Long passing','Ball control','Acceleration',</p>
-<p>'Sprint speed','Agility','Reactions','Balance',</p>
-<p>'Shot power','Jumping','Stamina','Strength',</p>
-<p>'Long shots','Aggression','Interceptions','Positioning',</p>
-<p>'Vision','Penalties','Composure','Marking',</p>
-<p>'Standing tackle','Sliding tackle','GK diving',</p>
-<p>'GK handling','GK kicking','GK positioning','GK reflexes']</p>
-<p>links=[]   #get all argentinian players</p>
-<p>for offset in ['0','80','160','240','320','400','480','560']:</p>
-
-<pre><code>page=requests.get('http://sofifa.com/players?na=52&amp;offset='+offset) 
-
-soup=BeautifulSoup(page.content,'html.parser')
-
-for link in soup.find_all('a'):
-
-    links.append(link.get('href'))
-
-</code></pre>
-<p>links=['<a href="http://sofifa.com'+l">http://sofifa.com'+l</a> for l in links if 'player/'in l]</p>
-<h4 id="pattern-regular-expression">pattern regular expression<a class="anchor-link" href="#pattern-regular-expression">&#182;</a></h4><p>pattern=r"""\s<em>([\w\s]</em>?)\s*FIFA"""   #file starts with empty spaces... players name...FIFA...other stuff</p>
-<p>for attr in attributes:</p>
-
-<pre><code>pattern+=r""".*?(\d*\s*"""+attr+r""")"""  #for each attribute we have other stuff..number..attribute..other stuff
-
-</code></pre>
-<p>pat=re.compile(pattern, re.DOTALL)    #parsing multiline text</p>
-<p>rows=[]</p>
-<p>links=links[10:]</p>
-<p>for j,link in enumerate(links):</p>
-
-<pre><code>print (j,link)
-
-row=[link]
-
-playerpage=requests.get(link)
-
-playersoup=BeautifulSoup(playerpage.content,'html.parser')
-
-text=playersoup.get_text()
-
-text=unicodedata.normalize('NFKD', text).encode('ascii','ignore')
-
-a=pat.match(text.decode('utf-8'))
-
-row.append(a.group(1))
-
-for i in range(2,len(attributes)+2):
-
-    row.append(int(a.group(i).split()[0]))
-
-rows.append(row)
-
-print (row[1])
-
-</code></pre>
-<p>df=pd.DataFrame(rows,columns=['link','name']+attributes)</p>
-<p>df.to_csv('ArgentinaPlayers.csv',index=False)</p>
+<p>By exploring the link www.sofifa.com, we realised the url changes to to reference the player selected. In addition, we noticed only a maximimum of 80 players of a country fit on one page. By clicking next we noticed how the offset refelects this fact by incrementing in units of 80. Using this insight we ran the provided code footballscrape.py to get the data for Argentinian players. This file was downloaded and saved as 'ArgentinaPlayers.csv', see attachments.</p>
 
 </div>
 </div>
@@ -11915,102 +11841,105 @@ want to look at the following websites: www.crummy.com/software/BeautifulSoup, w
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In order to capture the 480 english players, we need to change the code in the following ways. Firstly given that they are only 480 english players we need to change the offset to 400. Secondly, many of the english players have '-',''' etc. in their name. We then modify the section in pattern to take these into account. Lastly, we change the name of the csv of the output to EnglandPlayers.csv. An example of the changed code is below.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Changed code for English Players</strong></p>
-<p>import pandas as pd</p>
-<p>from bs4 import BeautifulSoup</p>
-<p>import requests</p>
-<p>import re</p>
-<p>import unicodedata</p>
-<p>attributes=['Crossing','Finishing','Heading accuracy',</p>
-<p>'Short passing','Volleys','Dribbling','Curve',</p>
-<p>'Free kick accuracy','Long passing','Ball control','Acceleration',</p>
-<p>'Sprint speed','Agility','Reactions','Balance',</p>
-<p>'Shot power','Jumping','Stamina','Strength',</p>
-<p>'Long shots','Aggression','Interceptions','Positioning',</p>
-<p>'Vision','Penalties','Composure','Marking',</p>
-<p>'Standing tackle','Sliding tackle','GK diving',</p>
-<p>'GK handling','GK kicking','GK positioning','GK reflexes']</p>
-<p>links=[]   #get all england players</p>
-<p>for offset in ['0','80','160','240','320','400']:</p>
-
-<pre><code>page=requests.get('http://sofifa.com/players?na=14&amp;offset='+offset) 
-
-soup=BeautifulSoup(page.content,'html.parser')
-
-for link in soup.find_all('a'):
-
-    links.append(link.get('href'))
-
-</code></pre>
-<p>links=['<a href="http://sofifa.com'+l">http://sofifa.com'+l</a> for l in links if 'player/'in l]</p>
-<h4 id="pattern-regular-expression">pattern regular expression<a class="anchor-link" href="#pattern-regular-expression">&#182;</a></h4><p>pattern=r"""\s<em>([\w\s-\'.]</em>?)\s*FIFA"""   #file starts with empty spaces... players name...FIFA...other stuff</p>
-<p>for attr in attributes:</p>
-
-<pre><code>pattern+=r""".*?(\d*\s*"""+attr+r""")"""  #for each attribute we have other stuff..number..attribute..other stuff
-
-</code></pre>
-<p>pat=re.compile(pattern, re.DOTALL)    #parsing multiline text</p>
-<p>rows=[]</p>
-<p>links=links[10:]</p>
-<p>for j,link in enumerate(links):</p>
-
-<pre><code>print (j,link)
-
-row=[link]
-
-playerpage=requests.get(link)
-
-playersoup=BeautifulSoup(playerpage.content,'html.parser')
-
-text=playersoup.get_text()
-
-text=unicodedata.normalize('NFKD', text).encode('ascii','ignore')
-
-a=pat.match(text.decode('utf-8'))
-
-row.append(a.group(1))
-
-for i in range(2,len(attributes)+2):
-
-    row.append(int(a.group(i).split()[0]))
-
-rows.append(row)
-
-print (row[1])
-
-</code></pre>
-<p>df=pd.DataFrame(rows,columns=['link','name']+attributes)</p>
-<p>df.to_csv('EnglandPlayers.csv',index=False)</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>4. Use the sklearn.cluster.KMeans Python class to cluster the players into 4 clusters.</strong></p>
+<p>In order to capture the 480 english players, we need to change the code in the following ways. Firstly given that they are only 480 english players we need to change the offset to 400. Secondly, many of the english players have '-',''' etc. in their name. We then modify the section in pattern to take these into account. Lastly, we change the name of the csv of the output to EnglandPlayers.csv. An example of the changed code is below, we have slightly modified it for the sake of this ipython notebook, in that we don't create the final step a csv (so we can continue using the df in the next cell) and don't print the players at each step, however see attached "england_footballscrape.py" which is the full version run into csv.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
-<span class="c1">#os.chdir(&#39;/&#39;)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Changed code for English Players</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="k">import</span> <span class="n">BeautifulSoup</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">unicodedata</span>
+
+<span class="n">attributes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Crossing&#39;</span><span class="p">,</span><span class="s1">&#39;Finishing&#39;</span><span class="p">,</span><span class="s1">&#39;Heading accuracy&#39;</span><span class="p">,</span>
+
+ <span class="s1">&#39;Short passing&#39;</span><span class="p">,</span><span class="s1">&#39;Volleys&#39;</span><span class="p">,</span><span class="s1">&#39;Dribbling&#39;</span><span class="p">,</span><span class="s1">&#39;Curve&#39;</span><span class="p">,</span>
+
+ <span class="s1">&#39;Free kick accuracy&#39;</span><span class="p">,</span><span class="s1">&#39;Long passing&#39;</span><span class="p">,</span><span class="s1">&#39;Ball control&#39;</span><span class="p">,</span><span class="s1">&#39;Acceleration&#39;</span><span class="p">,</span>
+
+ <span class="s1">&#39;Sprint speed&#39;</span><span class="p">,</span><span class="s1">&#39;Agility&#39;</span><span class="p">,</span><span class="s1">&#39;Reactions&#39;</span><span class="p">,</span><span class="s1">&#39;Balance&#39;</span><span class="p">,</span>
+
+ <span class="s1">&#39;Shot power&#39;</span><span class="p">,</span><span class="s1">&#39;Jumping&#39;</span><span class="p">,</span><span class="s1">&#39;Stamina&#39;</span><span class="p">,</span><span class="s1">&#39;Strength&#39;</span><span class="p">,</span>
+
+ <span class="s1">&#39;Long shots&#39;</span><span class="p">,</span><span class="s1">&#39;Aggression&#39;</span><span class="p">,</span><span class="s1">&#39;Interceptions&#39;</span><span class="p">,</span><span class="s1">&#39;Positioning&#39;</span><span class="p">,</span>
+
+ <span class="s1">&#39;Vision&#39;</span><span class="p">,</span><span class="s1">&#39;Penalties&#39;</span><span class="p">,</span><span class="s1">&#39;Composure&#39;</span><span class="p">,</span><span class="s1">&#39;Marking&#39;</span><span class="p">,</span>
+
+ <span class="s1">&#39;Standing tackle&#39;</span><span class="p">,</span><span class="s1">&#39;Sliding tackle&#39;</span><span class="p">,</span><span class="s1">&#39;GK diving&#39;</span><span class="p">,</span>
+
+ <span class="s1">&#39;GK handling&#39;</span><span class="p">,</span><span class="s1">&#39;GK kicking&#39;</span><span class="p">,</span><span class="s1">&#39;GK positioning&#39;</span><span class="p">,</span><span class="s1">&#39;GK reflexes&#39;</span><span class="p">]</span>
+
+<span class="n">links</span><span class="o">=</span><span class="p">[]</span>   <span class="c1">#get all england players</span>
+
+<span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;80&#39;</span><span class="p">,</span><span class="s1">&#39;160&#39;</span><span class="p">,</span><span class="s1">&#39;240&#39;</span><span class="p">,</span><span class="s1">&#39;320&#39;</span><span class="p">,</span><span class="s1">&#39;400&#39;</span><span class="p">]:</span>
+
+    <span class="n">page</span><span class="o">=</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://sofifa.com/players?na=14&amp;offset=&#39;</span><span class="o">+</span><span class="n">offset</span><span class="p">)</span> 
+
+    <span class="n">soup</span><span class="o">=</span><span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">content</span><span class="p">,</span><span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">):</span>
+
+        <span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">link</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">))</span>
+
+<span class="n">links</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;http://sofifa.com&#39;</span><span class="o">+</span><span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">links</span> <span class="k">if</span> <span class="s1">&#39;player/&#39;</span><span class="ow">in</span> <span class="n">l</span><span class="p">]</span>  
+
+<span class="c1">####pattern regular expression </span>
+
+<span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;&quot;&quot;\s*([\w\s\-\&#39;\.]*?)\s*FIFA&quot;&quot;&quot;</span>   <span class="c1">#file starts with empty spaces... players name...FIFA...other stuff     </span>
+
+<span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+
+    <span class="n">pattern</span><span class="o">+=</span><span class="sa">r</span><span class="s2">&quot;&quot;&quot;.*?(\d*\s*&quot;&quot;&quot;</span><span class="o">+</span><span class="n">attr</span><span class="o">+</span><span class="sa">r</span><span class="s2">&quot;&quot;&quot;)&quot;&quot;&quot;</span>  <span class="c1">#for each attribute we have other stuff..number..attribute..other stuff</span>
+
+<span class="n">pat</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>    <span class="c1">#parsing multiline text</span>
+
+<span class="n">rows</span><span class="o">=</span><span class="p">[]</span>
+
+<span class="n">links</span><span class="o">=</span><span class="n">links</span><span class="p">[</span><span class="mi">10</span><span class="p">:]</span>
+
+<span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">link</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">links</span><span class="p">):</span>
+
+    <span class="c1">#print (j,link)</span>
+
+    <span class="n">row</span><span class="o">=</span><span class="p">[</span><span class="n">link</span><span class="p">]</span>
+
+    <span class="n">playerpage</span><span class="o">=</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">link</span><span class="p">)</span>
+
+    <span class="n">playersoup</span><span class="o">=</span><span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">playerpage</span><span class="o">.</span><span class="n">content</span><span class="p">,</span><span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+
+    <span class="n">text</span><span class="o">=</span><span class="n">playersoup</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+
+    <span class="n">text</span><span class="o">=</span><span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s1">&#39;NFKD&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+    <span class="n">a</span><span class="o">=</span><span class="n">pat</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="p">):</span>
+
+        <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="c1">#print (row[1])</span>
+
+<span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;link&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">attributes</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done&quot;</span><span class="p">)</span>
+
+<span class="c1">#df.to_csv(&#39;EnglandPlayers.csv&#39;,index=False)</span>
 </pre></div>
 
 </div>
@@ -12023,13 +11952,223 @@ print (row[1])
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[4]:</div>
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Done
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>4. Use the sklearn.cluster.KMeans Python class to cluster the players into 4 clusters.</strong></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#change your directory if necessary, if you are loading a csv</span>
+<span class="c1">#import os</span>
+<span class="c1">#os.getcwd()</span>
+<span class="c1">#os.chdir(&#39;/&#39;)</span>
+
+<span class="c1">#Preview dataframe of England players</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[12]:</div>
 
 
 
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
 
-<div class="output_text output_subarea output_execute_result">
-<pre>&#39;C:\\Users\\Rejpal\\Documents\\Study\\Imperial\\Modules\\On-going\\Machine Learning\\Assignments\\Homework 4&#39;</pre>
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>link</th>
+      <th>name</th>
+      <th>Crossing</th>
+      <th>Finishing</th>
+      <th>Heading accuracy</th>
+      <th>Short passing</th>
+      <th>Volleys</th>
+      <th>Dribbling</th>
+      <th>Curve</th>
+      <th>Free kick accuracy</th>
+      <th>...</th>
+      <th>Penalties</th>
+      <th>Composure</th>
+      <th>Marking</th>
+      <th>Standing tackle</th>
+      <th>Sliding tackle</th>
+      <th>GK diving</th>
+      <th>GK handling</th>
+      <th>GK kicking</th>
+      <th>GK positioning</th>
+      <th>GK reflexes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>http://sofifa.com/player/203042</td>
+      <td>Jack Butland</td>
+      <td>11</td>
+      <td>16</td>
+      <td>12</td>
+      <td>36</td>
+      <td>12</td>
+      <td>21</td>
+      <td>12</td>
+      <td>14</td>
+      <td>...</td>
+      <td>42</td>
+      <td>59</td>
+      <td>16</td>
+      <td>13</td>
+      <td>11</td>
+      <td>81</td>
+      <td>83</td>
+      <td>72</td>
+      <td>78</td>
+      <td>85</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>http://sofifa.com/player/54050</td>
+      <td>Wayne Rooney</td>
+      <td>77</td>
+      <td>81</td>
+      <td>75</td>
+      <td>81</td>
+      <td>84</td>
+      <td>73</td>
+      <td>84</td>
+      <td>81</td>
+      <td>...</td>
+      <td>84</td>
+      <td>88</td>
+      <td>48</td>
+      <td>51</td>
+      <td>37</td>
+      <td>10</td>
+      <td>11</td>
+      <td>13</td>
+      <td>8</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>http://sofifa.com/player/163631</td>
+      <td>Leighton Baines</td>
+      <td>86</td>
+      <td>63</td>
+      <td>74</td>
+      <td>79</td>
+      <td>63</td>
+      <td>78</td>
+      <td>81</td>
+      <td>81</td>
+      <td>...</td>
+      <td>90</td>
+      <td>81</td>
+      <td>78</td>
+      <td>81</td>
+      <td>78</td>
+      <td>8</td>
+      <td>15</td>
+      <td>10</td>
+      <td>13</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>http://sofifa.com/player/169595</td>
+      <td>Danny Rose</td>
+      <td>81</td>
+      <td>57</td>
+      <td>62</td>
+      <td>76</td>
+      <td>64</td>
+      <td>79</td>
+      <td>64</td>
+      <td>57</td>
+      <td>...</td>
+      <td>57</td>
+      <td>75</td>
+      <td>82</td>
+      <td>84</td>
+      <td>85</td>
+      <td>10</td>
+      <td>11</td>
+      <td>8</td>
+      <td>13</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>http://sofifa.com/player/194957</td>
+      <td>Phil Jones</td>
+      <td>64</td>
+      <td>50</td>
+      <td>78</td>
+      <td>75</td>
+      <td>60</td>
+      <td>60</td>
+      <td>38</td>
+      <td>35</td>
+      <td>...</td>
+      <td>55</td>
+      <td>72</td>
+      <td>79</td>
+      <td>81</td>
+      <td>82</td>
+      <td>10</td>
+      <td>8</td>
+      <td>6</td>
+      <td>16</td>
+      <td>11</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 36 columns</p>
+</div>
 </div>
 
 </div>
@@ -12040,7 +12179,7 @@ print (row[1])
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># loading libraries</span>
@@ -12051,7 +12190,8 @@ print (row[1])
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="c1">#import dataset</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="s1">&#39;EnglandPlayers.csv&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+<span class="c1">#can read csv, we have used the df directly from above for the sake of this ipython notebook</span>
+<span class="c1">#df = pd.read_table(&#39;EnglandPlayers.csv&#39;, sep=&#39;,&#39;)</span>
 <span class="n">df1</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">2</span><span class="p">:]</span>
 
 <span class="c1">#apply clusters, set to 4</span>
@@ -12102,7 +12242,7 @@ ingful labels to the clusters.</strong></p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#We store the clusters</span>
@@ -12111,7 +12251,799 @@ ingful labels to the clusters.</strong></p>
 <span class="n">clus2</span> <span class="o">=</span> <span class="n">players</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">players</span><span class="o">.</span><span class="n">Groups</span> <span class="o">==</span> <span class="mi">2</span><span class="p">]</span>
 <span class="n">clus3</span> <span class="o">=</span> <span class="n">players</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">players</span><span class="o">.</span><span class="n">Groups</span> <span class="o">==</span> <span class="mi">3</span><span class="p">]</span>
 
-<span class="n">k_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">clus0</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">clus1</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">clus2</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+<span class="c1">#Preview cluster 0</span>
+<span class="n">clus0</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[23]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>link</th>
+      <th>name</th>
+      <th>Crossing</th>
+      <th>Finishing</th>
+      <th>Heading accuracy</th>
+      <th>Short passing</th>
+      <th>Volleys</th>
+      <th>Dribbling</th>
+      <th>Curve</th>
+      <th>Free kick accuracy</th>
+      <th>...</th>
+      <th>Composure</th>
+      <th>Marking</th>
+      <th>Standing tackle</th>
+      <th>Sliding tackle</th>
+      <th>GK diving</th>
+      <th>GK handling</th>
+      <th>GK kicking</th>
+      <th>GK positioning</th>
+      <th>GK reflexes</th>
+      <th>Groups</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>http://sofifa.com/player/203042</td>
+      <td>Jack Butland</td>
+      <td>11</td>
+      <td>16</td>
+      <td>12</td>
+      <td>36</td>
+      <td>12</td>
+      <td>21</td>
+      <td>12</td>
+      <td>14</td>
+      <td>...</td>
+      <td>59</td>
+      <td>16</td>
+      <td>13</td>
+      <td>11</td>
+      <td>81</td>
+      <td>83</td>
+      <td>72</td>
+      <td>78</td>
+      <td>85</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>http://sofifa.com/player/163264</td>
+      <td>Tom Heaton</td>
+      <td>17</td>
+      <td>12</td>
+      <td>16</td>
+      <td>32</td>
+      <td>12</td>
+      <td>17</td>
+      <td>15</td>
+      <td>13</td>
+      <td>...</td>
+      <td>56</td>
+      <td>15</td>
+      <td>15</td>
+      <td>13</td>
+      <td>80</td>
+      <td>79</td>
+      <td>76</td>
+      <td>80</td>
+      <td>83</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>http://sofifa.com/player/150724</td>
+      <td>Joe Hart</td>
+      <td>14</td>
+      <td>14</td>
+      <td>10</td>
+      <td>32</td>
+      <td>19</td>
+      <td>23</td>
+      <td>17</td>
+      <td>13</td>
+      <td>...</td>
+      <td>60</td>
+      <td>14</td>
+      <td>14</td>
+      <td>13</td>
+      <td>80</td>
+      <td>77</td>
+      <td>73</td>
+      <td>80</td>
+      <td>83</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>http://sofifa.com/player/163155</td>
+      <td>Ben Foster</td>
+      <td>15</td>
+      <td>18</td>
+      <td>14</td>
+      <td>36</td>
+      <td>14</td>
+      <td>14</td>
+      <td>15</td>
+      <td>17</td>
+      <td>...</td>
+      <td>67</td>
+      <td>15</td>
+      <td>15</td>
+      <td>14</td>
+      <td>78</td>
+      <td>79</td>
+      <td>73</td>
+      <td>77</td>
+      <td>82</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>http://sofifa.com/player/204935</td>
+      <td>Jordan Pickford</td>
+      <td>17</td>
+      <td>19</td>
+      <td>15</td>
+      <td>50</td>
+      <td>20</td>
+      <td>14</td>
+      <td>18</td>
+      <td>16</td>
+      <td>...</td>
+      <td>51</td>
+      <td>14</td>
+      <td>20</td>
+      <td>12</td>
+      <td>77</td>
+      <td>77</td>
+      <td>86</td>
+      <td>74</td>
+      <td>82</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 37 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Preview cluster 1</span>
+<span class="n">clus1</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[24]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>link</th>
+      <th>name</th>
+      <th>Crossing</th>
+      <th>Finishing</th>
+      <th>Heading accuracy</th>
+      <th>Short passing</th>
+      <th>Volleys</th>
+      <th>Dribbling</th>
+      <th>Curve</th>
+      <th>Free kick accuracy</th>
+      <th>...</th>
+      <th>Composure</th>
+      <th>Marking</th>
+      <th>Standing tackle</th>
+      <th>Sliding tackle</th>
+      <th>GK diving</th>
+      <th>GK handling</th>
+      <th>GK kicking</th>
+      <th>GK positioning</th>
+      <th>GK reflexes</th>
+      <th>Groups</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>http://sofifa.com/player/203042</td>
+      <td>Jack Butland</td>
+      <td>11</td>
+      <td>16</td>
+      <td>12</td>
+      <td>36</td>
+      <td>12</td>
+      <td>21</td>
+      <td>12</td>
+      <td>14</td>
+      <td>...</td>
+      <td>59</td>
+      <td>16</td>
+      <td>13</td>
+      <td>11</td>
+      <td>81</td>
+      <td>83</td>
+      <td>72</td>
+      <td>78</td>
+      <td>85</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>http://sofifa.com/player/163264</td>
+      <td>Tom Heaton</td>
+      <td>17</td>
+      <td>12</td>
+      <td>16</td>
+      <td>32</td>
+      <td>12</td>
+      <td>17</td>
+      <td>15</td>
+      <td>13</td>
+      <td>...</td>
+      <td>56</td>
+      <td>15</td>
+      <td>15</td>
+      <td>13</td>
+      <td>80</td>
+      <td>79</td>
+      <td>76</td>
+      <td>80</td>
+      <td>83</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>http://sofifa.com/player/150724</td>
+      <td>Joe Hart</td>
+      <td>14</td>
+      <td>14</td>
+      <td>10</td>
+      <td>32</td>
+      <td>19</td>
+      <td>23</td>
+      <td>17</td>
+      <td>13</td>
+      <td>...</td>
+      <td>60</td>
+      <td>14</td>
+      <td>14</td>
+      <td>13</td>
+      <td>80</td>
+      <td>77</td>
+      <td>73</td>
+      <td>80</td>
+      <td>83</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>http://sofifa.com/player/163155</td>
+      <td>Ben Foster</td>
+      <td>15</td>
+      <td>18</td>
+      <td>14</td>
+      <td>36</td>
+      <td>14</td>
+      <td>14</td>
+      <td>15</td>
+      <td>17</td>
+      <td>...</td>
+      <td>67</td>
+      <td>15</td>
+      <td>15</td>
+      <td>14</td>
+      <td>78</td>
+      <td>79</td>
+      <td>73</td>
+      <td>77</td>
+      <td>82</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>http://sofifa.com/player/204935</td>
+      <td>Jordan Pickford</td>
+      <td>17</td>
+      <td>19</td>
+      <td>15</td>
+      <td>50</td>
+      <td>20</td>
+      <td>14</td>
+      <td>18</td>
+      <td>16</td>
+      <td>...</td>
+      <td>51</td>
+      <td>14</td>
+      <td>20</td>
+      <td>12</td>
+      <td>77</td>
+      <td>77</td>
+      <td>86</td>
+      <td>74</td>
+      <td>82</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 37 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Preview cluster 2</span>
+<span class="n">clus2</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[25]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>link</th>
+      <th>name</th>
+      <th>Crossing</th>
+      <th>Finishing</th>
+      <th>Heading accuracy</th>
+      <th>Short passing</th>
+      <th>Volleys</th>
+      <th>Dribbling</th>
+      <th>Curve</th>
+      <th>Free kick accuracy</th>
+      <th>...</th>
+      <th>Composure</th>
+      <th>Marking</th>
+      <th>Standing tackle</th>
+      <th>Sliding tackle</th>
+      <th>GK diving</th>
+      <th>GK handling</th>
+      <th>GK kicking</th>
+      <th>GK positioning</th>
+      <th>GK reflexes</th>
+      <th>Groups</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>12</th>
+      <td>http://sofifa.com/player/231677</td>
+      <td>Marcus Rashford</td>
+      <td>77</td>
+      <td>79</td>
+      <td>72</td>
+      <td>2</td>
+      <td>72</td>
+      <td>84</td>
+      <td>74</td>
+      <td>78</td>
+      <td>...</td>
+      <td>74</td>
+      <td>29</td>
+      <td>37</td>
+      <td>33</td>
+      <td>11</td>
+      <td>6</td>
+      <td>15</td>
+      <td>7</td>
+      <td>14</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>http://sofifa.com/player/186146</td>
+      <td>Danny Welbeck</td>
+      <td>69</td>
+      <td>75</td>
+      <td>75</td>
+      <td>76</td>
+      <td>76</td>
+      <td>80</td>
+      <td>61</td>
+      <td>62</td>
+      <td>...</td>
+      <td>76</td>
+      <td>28</td>
+      <td>38</td>
+      <td>33</td>
+      <td>9</td>
+      <td>10</td>
+      <td>6</td>
+      <td>12</td>
+      <td>16</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>http://sofifa.com/player/50542</td>
+      <td>Jermain Defoe</td>
+      <td>54</td>
+      <td>87</td>
+      <td>66</td>
+      <td>68</td>
+      <td>82</td>
+      <td>78</td>
+      <td>63</td>
+      <td>68</td>
+      <td>...</td>
+      <td>84</td>
+      <td>24</td>
+      <td>20</td>
+      <td>11</td>
+      <td>7</td>
+      <td>14</td>
+      <td>8</td>
+      <td>10</td>
+      <td>13</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>http://sofifa.com/player/164859</td>
+      <td>Theo Walcott</td>
+      <td>74</td>
+      <td>76</td>
+      <td>58</td>
+      <td>74</td>
+      <td>71</td>
+      <td>81</td>
+      <td>76</td>
+      <td>74</td>
+      <td>...</td>
+      <td>76</td>
+      <td>33</td>
+      <td>39</td>
+      <td>36</td>
+      <td>11</td>
+      <td>8</td>
+      <td>9</td>
+      <td>9</td>
+      <td>8</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>http://sofifa.com/player/183125</td>
+      <td>Troy Deeney</td>
+      <td>55</td>
+      <td>80</td>
+      <td>82</td>
+      <td>73</td>
+      <td>78</td>
+      <td>65</td>
+      <td>68</td>
+      <td>36</td>
+      <td>...</td>
+      <td>78</td>
+      <td>33</td>
+      <td>29</td>
+      <td>25</td>
+      <td>10</td>
+      <td>11</td>
+      <td>16</td>
+      <td>12</td>
+      <td>15</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 37 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Preview cluster 3</span>
+<span class="n">clus3</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[26]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>link</th>
+      <th>name</th>
+      <th>Crossing</th>
+      <th>Finishing</th>
+      <th>Heading accuracy</th>
+      <th>Short passing</th>
+      <th>Volleys</th>
+      <th>Dribbling</th>
+      <th>Curve</th>
+      <th>Free kick accuracy</th>
+      <th>...</th>
+      <th>Composure</th>
+      <th>Marking</th>
+      <th>Standing tackle</th>
+      <th>Sliding tackle</th>
+      <th>GK diving</th>
+      <th>GK handling</th>
+      <th>GK kicking</th>
+      <th>GK positioning</th>
+      <th>GK reflexes</th>
+      <th>Groups</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>http://sofifa.com/player/54050</td>
+      <td>Wayne Rooney</td>
+      <td>77</td>
+      <td>81</td>
+      <td>75</td>
+      <td>81</td>
+      <td>84</td>
+      <td>73</td>
+      <td>84</td>
+      <td>81</td>
+      <td>...</td>
+      <td>88</td>
+      <td>48</td>
+      <td>51</td>
+      <td>37</td>
+      <td>10</td>
+      <td>11</td>
+      <td>13</td>
+      <td>8</td>
+      <td>7</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>http://sofifa.com/player/163631</td>
+      <td>Leighton Baines</td>
+      <td>86</td>
+      <td>63</td>
+      <td>74</td>
+      <td>79</td>
+      <td>63</td>
+      <td>78</td>
+      <td>81</td>
+      <td>81</td>
+      <td>...</td>
+      <td>81</td>
+      <td>78</td>
+      <td>81</td>
+      <td>78</td>
+      <td>8</td>
+      <td>15</td>
+      <td>10</td>
+      <td>13</td>
+      <td>12</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>http://sofifa.com/player/169595</td>
+      <td>Danny Rose</td>
+      <td>81</td>
+      <td>57</td>
+      <td>62</td>
+      <td>76</td>
+      <td>64</td>
+      <td>79</td>
+      <td>64</td>
+      <td>57</td>
+      <td>...</td>
+      <td>75</td>
+      <td>82</td>
+      <td>84</td>
+      <td>85</td>
+      <td>10</td>
+      <td>11</td>
+      <td>8</td>
+      <td>13</td>
+      <td>13</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>http://sofifa.com/player/194957</td>
+      <td>Phil Jones</td>
+      <td>64</td>
+      <td>50</td>
+      <td>78</td>
+      <td>75</td>
+      <td>60</td>
+      <td>60</td>
+      <td>38</td>
+      <td>35</td>
+      <td>...</td>
+      <td>72</td>
+      <td>79</td>
+      <td>81</td>
+      <td>82</td>
+      <td>10</td>
+      <td>8</td>
+      <td>6</td>
+      <td>16</td>
+      <td>11</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>http://sofifa.com/player/183711</td>
+      <td>Jordan Henderson</td>
+      <td>81</td>
+      <td>67</td>
+      <td>65</td>
+      <td>85</td>
+      <td>72</td>
+      <td>74</td>
+      <td>80</td>
+      <td>74</td>
+      <td>...</td>
+      <td>78</td>
+      <td>73</td>
+      <td>2</td>
+      <td>76</td>
+      <td>7</td>
+      <td>13</td>
+      <td>7</td>
+      <td>9</td>
+      <td>13</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 37 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">k_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">clus0</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">clus1</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">clus2</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
 
 <span class="c1">#plot based on an attribute</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
@@ -12157,7 +13089,7 @@ ingful labels to the clusters.</strong></p>
 
 
 <div class="output_text output_subarea ">
-<pre>&lt;matplotlib.figure.Figure at 0x2661ff3e780&gt;</pre>
+<pre>&lt;matplotlib.figure.Figure at 0x1d178e8a898&gt;</pre>
 </div>
 
 </div>
@@ -12696,7 +13628,7 @@ SP1/85gD9BwtPmsAAAAASUVORK5CYII=
 
 
 <div class="output_text output_subarea ">
-<pre>&lt;matplotlib.figure.Figure at 0x2661ffaef28&gt;</pre>
+<pre>&lt;matplotlib.figure.Figure at 0x1d17c3d6d68&gt;</pre>
 </div>
 
 </div>
@@ -13219,7 +14151,7 @@ For each of your 4 clusters from Step 4, compute the cluster centroid. Assign th
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Calculate the euclidean distance using the centroids calculated</span>
